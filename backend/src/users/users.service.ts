@@ -19,7 +19,7 @@ export class UsersService {
 
   // 여기서 jwt 리턴해주고, 게임 로그인시 밸리데이트
   async findUserOrCreate(walletAddress: string): Promise<User> {
-    var user = await this.userRepository.findOneBy({ walletAddress: walletAddress })
+    var user = await this.userRepository.findOne({ walletAddress: walletAddress })
     if (user == undefined) {
       const newUser = new User();
       newUser.walletAddress = walletAddress;
@@ -41,7 +41,7 @@ export class UsersService {
   async getAllItems(walletAddress: string): Promise<UpdateItemsDto> {
     const user = await this.findUser(walletAddress);
 
-    const returnItemsDto = new ItemsDto(user.gold,
+    const returnItemsDto = new ItemsDto(user.gold, 
       user.items && user.items.map(x => new OneItemDto(x.nftId, x.grade)));
     return returnItemsDto;
   }
@@ -68,7 +68,7 @@ export class UsersService {
     if (user.gold < itemsDto.gold) {
       throw new MethodNotAllowedException("user does not have items");
     }
-
+  
     var haveAllItems = true;
     const currentItemNftIds = user.items.map(x => x.nftId);
     const itemIdsToDelete = itemsDto.items.map(x => x.nftId);
@@ -88,13 +88,13 @@ export class UsersService {
     const newUserItems = user.items
       .filter(itemEntity => !itemIdsToDelete.includes(itemEntity.nftId))
 
-    // TODO: query runner and refactoring
+      // TODO: query runner and refactoring
     user.gold = user.gold - itemsDto.gold;
     user.items = newUserItems
     this.userRepository.save(user)
     const itemsToDelete = user.items
-      .filter(itemEntity => itemIdsToDelete.includes(itemEntity.nftId))
-    itemsToDelete.forEach((v, i) => this.itemRepository.delete(v))
+    .filter(itemEntity => itemIdsToDelete.includes(itemEntity.nftId))
+    itemsToDelete.forEach((v,i) => this.itemRepository.delete(v))
   }
 
   async findTopScoreUser(): Promise<User> {

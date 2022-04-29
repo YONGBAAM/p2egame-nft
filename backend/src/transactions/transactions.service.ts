@@ -12,7 +12,7 @@ export class TransactionsService {
   ) { };
 
   async create(walletAddress: string, toNft: boolean, transactionId: string) {
-    const currentTx = await this.transactionRepository.findOneBy({ transactionId: transactionId })
+    const currentTx = await this.transactionRepository.findOne({ transactionId: transactionId })
     if (currentTx) {
       throw new Error(`Transaction ${transactionId} already exists`);
     }

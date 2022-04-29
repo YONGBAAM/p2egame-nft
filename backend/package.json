@@ -37,7 +37,6 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.4.0",
-    "typeorm": "^0.3.6",
     "ulid": "^2.3.0",
     "web3": "^1.7.3",
     "web3-utils": "^1.7.3"
