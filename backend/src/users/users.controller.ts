@@ -4,6 +4,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateItemsDto } from './dto/update-items.dto';
 import { OneItemDto } from './dto/one-item-dto';
 
+
+// NOTE: This is raw update of items. 
 @Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
