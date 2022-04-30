@@ -3,18 +3,19 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from "typeorm"
 import { User } from './entities/user.entity';
-import { Item } from './entities/item.entity';
-import { UpdateItemsDto as ItemsDto, UpdateItemsDto } from './dto/update-items.dto';
-import { OneItemDto } from './dto/one-item-dto';
-import { Transaction } from 'src/transactions/entities/transaction.entity';
+import { UpdateItemsDto } from './dto/update-items.dto';
+import { Item } from './dto/item';
 
+
+/*
+Note: this is based on non-migrated versions.
+Please Refactor
+*/
 // Service만 먼저 짜고, 컨트롤러에서 여러개 분기
-
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Item) private itemRepository: Repository<Item>
+    @InjectRepository(User) private userRepository: Repository<User>
   ) { };
 
   // 여기서 jwt 리턴해주고, 게임 로그인시 밸리데이트
@@ -32,7 +33,7 @@ export class UsersService {
 
   async findUser(walletAddress: string): Promise<User> {
     const user = this.userRepository
-      .findOne({ where: { walletAddress }, relations: ["items"] })
+      .findOne({ where: { walletAddress }})
 
     if (user === undefined) { throw new Error("user not found: " + walletAddress) }
     return user;
@@ -41,44 +42,41 @@ export class UsersService {
   async getAllItems(walletAddress: string): Promise<UpdateItemsDto> {
     const user = await this.findUser(walletAddress);
 
-    const returnItemsDto = new ItemsDto(user.gold, 
-      user.items && user.items.map(x => new OneItemDto(x.nftId, x.grade)));
+    const returnItemsDto = new UpdateItemsDto(user.gold, user.items);
     return returnItemsDto;
   }
 
-  async addAllItems(walletAddress: string, itemsDto: ItemsDto) {
+  async addAllItems(walletAddress: string, itemsDto: UpdateItemsDto) {
     const user = await this.findUser(walletAddress);
-
+    if (!user.items) {
+      user.items = [];
+    }
     for (const itemDto of itemsDto.items) {  // in 은 인덱스, of가 'in'
-      const itemEntity = new Item();
-      itemEntity.nftId = itemDto.nftId;
-      itemEntity.grade = itemDto.grade;
-      itemEntity.user = user;
-      user.items.push(itemEntity);
-      this.itemRepository.save(itemEntity);
+      const itemEntity =
+        user.items.push(new Item(itemDto.nft_id, itemDto.attributes));
     }
     user.gold = user.gold + itemsDto.gold;
-    Logger.log(user)
+    Logger.log(user.toString())
     this.userRepository.save(user)
   }
 
-  async deleteAllItems(walletAddress: string, itemsDto: ItemsDto) {
+  async deleteAllItems(walletAddress: string, deleteItemsDto: UpdateItemsDto) {
     const user = await this.findUser(walletAddress);
 
-    if (user.gold < itemsDto.gold) {
+    if (user.gold < deleteItemsDto.gold) {
       throw new MethodNotAllowedException("user does not have items");
     }
-  
+
     var haveAllItems = true;
-    const currentItemNftIds = user.items.map(x => x.nftId);
-    const itemIdsToDelete = itemsDto.items.map(x => x.nftId);
+    const currentItemNftIds = user.items.map(x => x.nft_id);
+    const itemIdsToDelete = deleteItemsDto.items.map(x => x.nft_id);
 
 
     Logger.log("items" + itemIdsToDelete.join(","));
     const newitems: Item[] = [];
     Logger.log(currentItemNftIds.join(","))
-    for (const item of itemsDto.items) {
-      if (!currentItemNftIds.includes(item.nftId)) {
+    for (const item of deleteItemsDto.items) {
+      if (!currentItemNftIds.includes(item.nft_id)) {
         haveAllItems = false;
         throw new MethodNotAllowedException("user does not have items");
       }
@@ -86,15 +84,13 @@ export class UsersService {
     }
 
     const newUserItems = user.items
-      .filter(itemEntity => !itemIdsToDelete.includes(itemEntity.nftId))
+      .filter(itemEntity => !itemIdsToDelete.includes(itemEntity.nft_id))
 
-      // TODO: query runner and refactoring
-    user.gold = user.gold - itemsDto.gold;
+    // TODO: query runner and refactoring
+    user.gold = user.gold - deleteItemsDto.gold;
     user.items = newUserItems
     this.userRepository.save(user)
-    const itemsToDelete = user.items
-    .filter(itemEntity => itemIdsToDelete.includes(itemEntity.nftId))
-    itemsToDelete.forEach((v,i) => this.itemRepository.delete(v))
+
   }
 
   async findTopScoreUser(): Promise<User> {

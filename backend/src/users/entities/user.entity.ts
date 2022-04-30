@@ -1,12 +1,12 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { Item } from "./item.entity";
+import { Item } from "../dto/item";
 
 @Entity("User")
 export class User {
   @PrimaryColumn()
   walletAddress: string;
 
-  @OneToMany(() => Item, item => item.user)
+  @Column("jsonb", {nullable:true})
   items: Item[];
 
   @Column("float")

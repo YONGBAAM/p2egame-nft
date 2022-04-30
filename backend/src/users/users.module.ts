@@ -5,13 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { GameService } from './game.service';
 import { GameController } from './game.controller';
-import { Item } from './entities/item.entity';
+import { TransactionsModule } from 'src/transactions/transactions.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    TypeOrmModule.forFeature([Item]),
-
+    TransactionsModule
 ],
   controllers: [UsersController, GameController],
   providers: [UsersService, GameService]

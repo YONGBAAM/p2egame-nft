@@ -1,14 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateItemsDto } from './dto/update-items.dto';
-import { OneItemDto } from './dto/one-item-dto';
+import { Item } from './dto/item';
+import { OnChainService } from 'src/transactions/on-chain.service';
 
 
 // NOTE: This is raw update of items. 
 @Controller()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly onChainService: OnChainService
+
+  ) { }
 
   @Post("user")
   async createOrLogin(@Body() createUserDto: CreateUserDto): Promise<void> {
@@ -20,21 +25,36 @@ export class UsersController {
     return this.usersService.getAllItems(wallet);
   }
 
-  @Post("inventory/:wallet/gold")
-  async addGold(@Param("wallet") wallet: string,
-    @Body() updateItemsDto: UpdateItemsDto
+  @Put("inventory/:wallet/gold/:amount")
+  async addGold(@Param("wallet") wallet: string, @Param("amount") amount: number
   ) {
-    return this.usersService.addAllItems(wallet, updateItemsDto)
+    return this.usersService.addAllItems(wallet, new UpdateItemsDto(amount, []))
   }
 
   @Delete("inventory/:wallet/gold/:amount")
-  async removeGold(@Param("wallet") wallet: string,
-    @Param("amount") amount: number
+  async removeGold(@Param("wallet") wallet: string, @Param("amount") amount: number
   ) {
     if (amount < 0) {
       throw new Error("amount must be greater than 0")
     }
     const dto = new UpdateItemsDto(amount, []);
+    return this.usersService.deleteAllItems(wallet, dto)
+  }
+
+  @Put("inventory/:wallet/items/:nftId")
+  async addItem(@Param("wallet") wallet: string, @Param("nftId") nftId: number
+  ) {
+    const itemMetadata = await this.onChainService.queryNftMetaData(nftId);
+    const item = new Item(nftId, itemMetadata.attributes);
+    const dto = new UpdateItemsDto(0, [item]);
+    return this.usersService.addAllItems(wallet, dto)
+  }
+
+  @Delete("inventory/:wallet/items/:nftId")
+  async removeItem(@Param("wallet") wallet: string, @Param("nftId") nftId: number
+  ) {
+    const item = new Item(nftId, []);
+    const dto = new UpdateItemsDto(0, [item]);
     return this.usersService.deleteAllItems(wallet, dto)
   }
 
@@ -44,15 +64,4 @@ export class UsersController {
   ) {
     return this.usersService.addAllItems(wallet, updateItemsDto)
   }
-
-
-  @Delete("inventory/:wallet/items/:nftId")
-  async removeOneItem(@Param("wallet") wallet: string,
-    @Param("nftId") nftId: string
-  ) {
-    const item = new OneItemDto(nftId, 0);
-    const dto = new UpdateItemsDto(0, [item]);
-    return this.usersService.deleteAllItems(wallet, dto)
-  }
-
 }

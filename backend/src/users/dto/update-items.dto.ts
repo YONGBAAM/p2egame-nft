@@ -1,10 +1,10 @@
-import { OneItemDto } from "./one-item-dto";
+import { Item } from "./item";
 
 export class UpdateItemsDto {
-  constructor(gold: number, items: OneItemDto[]) {
+  constructor(gold: number, items: Item[]) {
     this.gold = gold;
     this.items = items;
   };
   gold: number = 0;
-  items: OneItemDto[] = [];
+  items: Item[] = [];
 }

@@ -2,7 +2,6 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ScoreDto } from "./dto/score.dto";
-import { Item } from "./entities/item.entity";
 import { User } from "./entities/user.entity";
 import { UsersService } from "./users.service";
 
@@ -11,7 +10,6 @@ export class GameService {
 
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Item) private itemRepository: Repository<Item>,
     private readonly usersService: UsersService
   ) { };
 

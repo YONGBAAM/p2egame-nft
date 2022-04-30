@@ -37,6 +37,11 @@ export class TransactionsController {
     return this.onChainService.findOwnerByNftId(nftId);
   }
 
+  @Get("testtt/:nftId")
+  async tt(@Param("nftId") nftId: number) {
+    return this.onChainService.queryNftMetaData(nftId);
+  }
+
   // Not tested yet.
   @Post("on-chain/nft")
   async sendNft(@Body() dto: sendNftDto) {

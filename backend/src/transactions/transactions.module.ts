@@ -12,6 +12,7 @@ import { OnChainService } from './on-chain.service';
 
   ],
   controllers: [TransactionsController],
-  providers: [TransactionsService, OnChainService]
+  providers: [TransactionsService, OnChainService],
+  exports: [OnChainService]
 })
 export class TransactionsModule {}

@@ -2,9 +2,11 @@ import { mintAnimalTokenContract, web3 } from '../web3Config'
 import { OnChainTransactionStatus } from './dto/on-chain-transaction-status.dto';
 import { changgo_address, changgo_private_key } from '../web3Config'
 import { TransactionReceipt } from 'web3-eth'
-import { Logger } from '@nestjs/common';
+import { Logger, NotImplementedException } from '@nestjs/common';
 import { toBN } from 'web3-utils';
-import Web3 from 'web3';
+import path from 'path';
+import * as fs from "fs"
+import { ItemMetadata } from 'src/users/dto/item-metadata';
 
 /*
 Unlike transaction service, This is adapter to block chain
@@ -41,6 +43,7 @@ export class OnChainService {
     }
   }
 
+  // depredated
   async findOwnerByNftId(nftId: number): Promise<string> {
     try {
       const nftIdBn = toBN(nftId);
@@ -72,6 +75,30 @@ export class OnChainService {
 
 
   }
+  
 
+  // TODO: Unify this two
+
+  // query metadat for NFT by ID
+  async queryNftMetaData(nftId:number):Promise<ItemMetadata>{
+    const fromOffline = true;
+    var rawFile;
+    if (fromOffline) {  
+      try {
+        rawFile = fs.readFileSync("src/resources/metadata/" + nftId + ".json", "utf8");
+      } catch (error) {
+        throw new Error("Cannot Read Metadata of " + nftId)
+      }
+       
+      const obj:ItemMetadata = JSON.parse(rawFile)
+      Logger.log(JSON.stringify(obj));
+      return obj
+    }
+    throw new NotImplementedException();
+  }
+
+  async queryNftOwner(nftId:number) {
+    throw new NotImplementedException();
+  }
   // send gold to wallet
 }
