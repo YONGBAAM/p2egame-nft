@@ -20,12 +20,12 @@ import * as Joi from 'joi';
           .required(),
           NFT_DB_DATABASE: Joi.string()
           .required(),
-          // CHAIN_RPC_ENDPOINT: Joi.string()
-          // .required().uri(),
+          CHAIN_RPC_ENDPOINT: Joi.string()
+          .required().uri(),
           CHAIN_OWNER_ACCOUNT:Joi.string()
           .required(),
-          // CHAIN_CONTRACT_ADDRESS:Joi.string()
-          // .required()
+          CHAIN_CONTRACT_ADDRESS:Joi.string()
+          .required()
 
       })
     }),

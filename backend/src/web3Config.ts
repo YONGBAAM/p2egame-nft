@@ -6,7 +6,7 @@ import { AbiItem } from "web3-utils"
 import * as Web3 from "web3";
 import { Logger } from "@nestjs/common";
 
-const contractAbi: AbiItem[] =
+const CONTRACT_ABI: AbiItem[] =
 	[
 		{
 			"inputs": [],
@@ -457,6 +457,23 @@ const contractAbi: AbiItem[] =
 			"type": "function"
 		}
 	]
+	;
+
+export class web3Wrapper {
+	constructor(chainRpcEndpoint: string, contractAddress: string) {
+		this.web3 = new Web3(new Web3.providers
+			.HttpProvider(chainRpcEndpoint));
+
+		// migrate this!
+		const nftTokenContract = new this.web3.eth.Contract(
+			CONTRACT_ABI,
+			contractAddress
+		)
+	};
+	const web3;
+	const nftTokenContract;
+
+}
 
 // TODO: Migrate this to env.
 
@@ -466,13 +483,3 @@ export const CHAIN_RPC_ENDPOINT = "https://rpc-mumbai.maticvigil.com"
 const CHAIN_CONTRACT_ADDRESS = "0xFE52646f2831f117b2bd9752f20E60935344d2c8"
 
 // const provider = new Web3.providers.HttpProvider("poligon_testnet_url");
-
-export const web3 = new Web3(new Web3.providers
-	.HttpProvider(CHAIN_RPC_ENDPOINT));
-
-export const mintAnimalTokenContract = new web3.eth.Contract(
-	contractAbi,
-	CHAIN_CONTRACT_ADDRESS
-)
-
-Logger.log(CHAIN_RPC_ENDPOINT)

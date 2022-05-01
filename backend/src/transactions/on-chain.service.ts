@@ -1,4 +1,4 @@
-import { CHAIN_RPC_ENDPOINT, mintAnimalTokenContract, web3 } from '../web3Config'
+import { CHAIN_RPC_ENDPOINT, web3Wrapper } from '../web3Config'
 import { OnChainTransactionStatus } from './dto/on-chain-transaction-status.dto';
 import { TransactionReceipt } from 'web3-eth'
 import { Inject, Logger, NotImplementedException } from '@nestjs/common';
@@ -8,15 +8,24 @@ import * as fs from "fs"
 import { ItemMetadata } from 'src/users/dto/item-metadata';
 import { ConfigType } from '@nestjs/config';
 import allConfig from 'src/config/allConfig';
+// import Web3 from 'web3';
 
 /*
 Unlike transaction service, This is adapter to block chain
 */
 export class OnChainService {
-constructor (
-  @Inject(allConfig.KEY) private config: ConfigType<typeof allConfig>,
+  constructor(
+    @Inject(allConfig.KEY) private config: ConfigType<typeof allConfig>,
 
-) {};
+  ) {
+    Logger.log(config.chainRpcEndpoint)
+    Logger.log(config.contractAddress)
+    const wr = new web3Wrapper(config.chainRpcEndpoint, config.contractAddress);
+    this.web3 = wr.web3;
+    this.contract = wr.nftTokenContract;
+  };
+  web3;
+  contract; // web3 contract
 
   private async sendTransaction() {
 
@@ -26,7 +35,7 @@ constructor (
     : Promise<OnChainTransactionStatus> {
     try {
       Logger.log("value:" + transactionHash)
-      const result = await web3.eth.getTransactionReceipt(transactionHash);
+      const result = await this.web3.eth.getTransactionReceipt(transactionHash);
       const status = new OnChainTransactionStatus();
       if (!result) {
         status.isGood = false;
@@ -42,7 +51,7 @@ constructor (
 
   async getBlockNumber(): Promise<number> {
     try {
-      const result = await web3.eth.getBlockNumber();
+      const result = await this.web3.eth.getBlockNumber();
       return result;
     } catch (error) {
       throw new Error(error)
@@ -54,7 +63,7 @@ constructor (
     try {
       const nftIdBn = toBN(nftId);
       // const result = await mintAnimalTokenContract.methods.ownerOf(nftId).call();
-      const result = await mintAnimalTokenContract.methods.ownerOf(nftIdBn).call();
+      const result = await this.contract.methods.ownerOf(nftIdBn).call();
       return result;
     } catch (error) {
       throw new Error(error)
@@ -65,15 +74,15 @@ constructor (
 
     const nftIdBn = toBN(nftId);
 
-    const tx = await mintAnimalTokenContract.methods.safeTransferFrom({
+    const tx = await this.contract.methods.safeTransferFrom({
       from: this.config.ownerWalletAccount,
       to: toAccount,
       tokenId: nftIdBn
     })
 
-    const account = web3.eth.accounts.privateKeyToAccount(this.config.ownerWalletKey);
+    const account = this.web3.eth.accounts.privateKeyToAccount(this.config.ownerWalletKey);
     const signedRawTx = account.sign(tx);
-    const result = await web3.eth.sendSignedTransaction(signedRawTx.rawTransaction);
+    const result = await this.web3.eth.sendSignedTransaction(signedRawTx.rawTransaction);
     return result;
     // TODO: add error handling and logger
     // TODO: wrap error messages since credentials could be exposed
@@ -81,29 +90,29 @@ constructor (
 
 
   }
-  
+
 
   // TODO: Unify this two
 
   // query metadat for NFT by ID
-  async queryNftMetaData(nftId:number):Promise<ItemMetadata>{
+  async queryNftMetaData(nftId: number): Promise<ItemMetadata> {
     const fromOffline = true;
     var rawFile;
-    if (fromOffline) {  
+    if (fromOffline) {
       try {
         rawFile = fs.readFileSync("src/resources/metadata/" + nftId + ".json", "utf8");
       } catch (error) {
         throw new Error("Cannot Read Metadata of " + nftId)
       }
-       
-      const obj:ItemMetadata = JSON.parse(rawFile)
+
+      const obj: ItemMetadata = JSON.parse(rawFile)
       Logger.log(JSON.stringify(obj));
       return obj
     }
     throw new NotImplementedException();
   }
 
-  async queryNftOwner(nftId:number) {
+  async queryNftOwner(nftId: number) {
     throw new NotImplementedException();
   }
   // send gold to wallet
