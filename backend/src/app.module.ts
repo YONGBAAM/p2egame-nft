@@ -19,7 +19,14 @@ import * as Joi from 'joi';
           NFT_DB_USERNAME: Joi.string()
           .required(),
           NFT_DB_DATABASE: Joi.string()
-          .required()
+          .required(),
+          // CHAIN_RPC_ENDPOINT: Joi.string()
+          // .required().uri(),
+          CHAIN_OWNER_ACCOUNT:Joi.string()
+          .required(),
+          // CHAIN_CONTRACT_ADDRESS:Joi.string()
+          // .required()
+
       })
     }),
     TypeOrmModule.forRoot({

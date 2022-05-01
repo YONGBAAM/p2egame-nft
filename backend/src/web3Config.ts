@@ -1,10 +1,12 @@
 // @ts-nocheck
+// due to issue with web3
 import { AbiItem } from "web3-utils"
 
 // TODO: User this as symlink
 import * as Web3 from "web3";
+import { Logger } from "@nestjs/common";
 
-const mintAnimalTokenAbi: AbiItem[] =
+const contractAbi: AbiItem[] =
 	[
 		{
 			"inputs": [],
@@ -456,20 +458,21 @@ const mintAnimalTokenAbi: AbiItem[] =
 		}
 	]
 
-const poligon_testnet_url: string = "https://rpc-mumbai.maticvigil.com"
-export const changgo_address = "0xc9B7F6CB9Ee166f4d113B5394A05E346048628d1"
-export const changgo_private_key = "936886a8be4264c1ad4df6130716d5eb700bfbc21a0e5cd7f076fc688c7aa8f6"
+// TODO: Migrate this to env.
 
-const mintAnimalTokenAddress = "0xFE52646f2831f117b2bd9752f20E60935344d2c8"
+export const CHAIN_RPC_ENDPOINT = "https://rpc-mumbai.maticvigil.com"
 
 
+const CHAIN_CONTRACT_ADDRESS = "0xFE52646f2831f117b2bd9752f20E60935344d2c8"
 
 // const provider = new Web3.providers.HttpProvider("poligon_testnet_url");
 
-export const web3 = new Web3(new Web3.providers.HttpProvider(poligon_testnet_url));
-
+export const web3 = new Web3(new Web3.providers
+	.HttpProvider(CHAIN_RPC_ENDPOINT));
 
 export const mintAnimalTokenContract = new web3.eth.Contract(
-	mintAnimalTokenAbi,
-	mintAnimalTokenAddress
+	contractAbi,
+	CHAIN_CONTRACT_ADDRESS
 )
+
+Logger.log(CHAIN_RPC_ENDPOINT)

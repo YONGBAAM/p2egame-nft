@@ -1,17 +1,23 @@
-import { mintAnimalTokenContract, web3 } from '../web3Config'
+import { CHAIN_RPC_ENDPOINT, mintAnimalTokenContract, web3 } from '../web3Config'
 import { OnChainTransactionStatus } from './dto/on-chain-transaction-status.dto';
-import { changgo_address, changgo_private_key } from '../web3Config'
 import { TransactionReceipt } from 'web3-eth'
-import { Logger, NotImplementedException } from '@nestjs/common';
+import { Inject, Logger, NotImplementedException } from '@nestjs/common';
 import { toBN } from 'web3-utils';
 import path from 'path';
 import * as fs from "fs"
 import { ItemMetadata } from 'src/users/dto/item-metadata';
+import { ConfigType } from '@nestjs/config';
+import allConfig from 'src/config/allConfig';
 
 /*
 Unlike transaction service, This is adapter to block chain
 */
 export class OnChainService {
+constructor (
+  @Inject(allConfig.KEY) private config: ConfigType<typeof allConfig>,
+
+) {};
+
   private async sendTransaction() {
 
   }
@@ -60,12 +66,12 @@ export class OnChainService {
     const nftIdBn = toBN(nftId);
 
     const tx = await mintAnimalTokenContract.methods.safeTransferFrom({
-      from: changgo_address,
+      from: this.config.ownerWalletAccount,
       to: toAccount,
       tokenId: nftIdBn
     })
 
-    const account = web3.eth.accounts.privateKeyToAccount(changgo_private_key);
+    const account = web3.eth.accounts.privateKeyToAccount(this.config.ownerWalletKey);
     const signedRawTx = account.sign(tx);
     const result = await web3.eth.sendSignedTransaction(signedRawTx.rawTransaction);
     return result;
