@@ -18,23 +18,17 @@ const Main: FC<mainProps> = ({
 
         try {
             if (!account) console.error("err")
-            const response = await mintAnimalTokenContract.methods.mintAnimalToken().send({ from: account })
+            const response = await mintAnimalTokenContract.methods.mint(1).send({ from: account})
             const txid = response.transactionHash;
             setTxidMessage(txid);
 
             if (response.status) {
                 // TODO: get last type from contract
-                const balanceLength = await mintAnimalTokenContract.methods
-                    .balanceOf(account).call(); // 컨트랙에서 어웨잇 걸ㅓ주네
+                const response:number[] = await mintAnimalTokenContract.methods
+                .walletOfOwner(account)
+                .call();
 
-                const animalTokenId = await mintAnimalTokenContract.methods
-                    .tokenOfOwnerByIndex(account, parseInt(balanceLength, 10) - 1).call()
-
-                const animalType = await mintAnimalTokenContract.methods
-                    .animalTypes(parseInt(animalTokenId, 10)).call();
-
-                console.log('' + animalTokenId + " // 0" + animalType)
-                setDisplayMessage(`Type: ${animalType}, Your NFT Count: ${balanceLength}`)
+                setDisplayMessage(`ID: ${response[response.length-1]}, Your NFT Count: ${response.length}`)
 
             }
 

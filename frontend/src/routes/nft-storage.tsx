@@ -10,11 +10,6 @@ interface NftStorageProps {
     account:string
 }
 
-interface tempAnimalNFTProps {
-    animalTokenId:number;
-    animalType:number;
-}
-
 const NFTStorage:FC<NftStorageProps> = ({account}) => {
     const [cardArray, setCardArray] = useState<ICardProps[]>([]);
 
@@ -27,15 +22,15 @@ const NFTStorage:FC<NftStorageProps> = ({account}) => {
 
             const tempAnimalCardArray: ICardProps[] = [];
 
-            const response = await mintAnimalTokenContract.methods
-                .getAnimalTokens(account)
+            const response:number[] = await mintAnimalTokenContract.methods
+                .walletOfOwner(account)
                 .call();
             
                 console.log(response);
-            response.map((v: tempAnimalNFTProps) => {
+                
+            response.map((v: number) => {
                 tempAnimalCardArray.push({
-                    nftId: v.animalTokenId,
-                    type:v.animalType,
+                    nftId: v,type:0
                 });
             });
 
