@@ -6,24 +6,33 @@ import { TransactionsModule } from './transactions/transactions.module';
 import {TypeOrmModule} from "@nestjs/typeorm"
 import { ConfigModule } from '@nestjs/config';
 import allConfig from './config/allConfig';
+import * as Joi from 'joi';
 @Module({
   imports: [UsersModule, TransactionsModule,
-  
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'root',
-      password: '1234',
-      database: 'test2',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // TODO: DO NOTT TRUE IN PROD, USE DOTENV or sth
-    }),
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/${process.env.NODE_ENV}.env`],
       load: [allConfig],
       isGlobal: true,
+      validationSchema: Joi.object({
+        NFT_DB_HOST: Joi.string()
+          .required(),
+          NFT_DB_USERNAME: Joi.string()
+          .required(),
+          NFT_DB_DATABASE: Joi.string()
+          .required()
+      })
     }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.NFT_DB_HOST,
+      port: 5432,
+      username: process.env.NFT_DB_USERNAME,
+      password: ""+process.env.NFT_DB_PASSWORD,
+      database: process.env.NFT_DB_DATABASE,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: (process.env.NFT_DB_SYNCHRONIZE === "true") ? true:false, // TODO: DO NOTT TRUE IN PROD, USE DOTENV or sth
+    }),
+    
   ],
   controllers: [AppController],
   providers: [AppService],
