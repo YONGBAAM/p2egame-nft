@@ -12,14 +12,12 @@ interface LayoutProps {
 const Layout: FC<LayoutProps> = ({ onConnected, account, children }) => { // size  = " 하면 이렇게 자동완성 나오네
 
     const connect = async (onConnected: Function) => {
-        if (!window.ethereum) {
+        if (!window.klaytn) {
             alert("Get MetaMask!");
             return;
         }
 
-        const accounts = await window.ethereum.request({
-            method: "eth_requestAccounts",
-        });
+        const accounts = await window.klaytn.enable();
         console.log("account:" + accounts[0])
         onConnected(accounts[0]);
         updateSession()
@@ -33,13 +31,12 @@ const Layout: FC<LayoutProps> = ({ onConnected, account, children }) => { // siz
 
     // At first login, check if connected.
     const checkConnected = async (onConnected: Function) => {
-        if (!window.ethereum) {
+        if (!window.klaytn) {
             return;
         }
 
-        const accounts = await window.ethereum.request({
-            method: "eth_requestAccounts",
-        });
+        const accounts = await window.klaytn.enable();
+
         console.log("account:" + accounts[0])
         onConnected(accounts[0]);
         updateSession()

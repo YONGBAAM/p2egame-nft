@@ -1,9 +1,9 @@
-import { AbiItem } from "web3-utils"
+// import { AbiItem } from "web3-utils"
 
-import Web3 from "web3"
+// import Web3 from "web3"
+import Caver, { AbiItem } from "caver-js"
 
-const nftAbi:AbiItem[] = 
-[
+export const nftAbi:AbiItem[] = [
 	{
 		"inputs": [
 			{
@@ -685,11 +685,13 @@ const nftAbi:AbiItem[] =
 	}
 ]
 
-const nftAddress = process.env.REACT_APP_CONTRACT_DEPLOYED_ADDRESS;
+export const nftAddress = process.env.REACT_APP_CONTRACT_DEPLOYED_ADDRESS;
 
-const web3 = new Web3(window.ethereum);
+export const caver = new Caver(
+	"https://api.baobab.klaytn.net:8651/"
+	);
 
-export const mintAnimalTokenContract = new web3.eth.Contract(
+export const mintAnimalTokenContract = caver.contract.create(
 	nftAbi,
 	nftAddress
 )
