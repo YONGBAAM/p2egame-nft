@@ -22,6 +22,13 @@ const Layout: FC<LayoutProps> = ({ onConnected, account, children }) => { // siz
         });
         console.log("account:" + accounts[0])
         onConnected(accounts[0]);
+        updateSession()
+    }
+
+    const updateSession = async () => {
+        localStorage.setItem("phaser_game_account", account)
+        const ss = localStorage.getItem("phaser_game_account")
+        console.log("session: " + ss)
     }
 
     // At first login, check if connected.
@@ -35,6 +42,7 @@ const Layout: FC<LayoutProps> = ({ onConnected, account, children }) => { // siz
         });
         console.log("account:" + accounts[0])
         onConnected(accounts[0]);
+        updateSession()
     };
 
     useEffect(() => {
@@ -74,6 +82,26 @@ const Layout: FC<LayoutProps> = ({ onConnected, account, children }) => { // siz
                     </Button>
                 </Link>
 
+                <Link to={{ pathname: "game" }} target="_top">
+
+                    <Button size="sm" colorScheme="blue">
+                        GAME
+                    </Button>
+                </Link>
+
+
+                <Link to="/game">
+
+                    <Button size="sm" colorScheme="blue">
+                        GAME2
+                    </Button>
+                </Link>
+                <Button size="sm" colorScheme="blue" onClick = {() => {
+                
+                        window.location.replace('http://localhost:8000')
+                }}>
+                        GAME3
+                    </Button>
                 <Button onClick={() => connect(onConnected)}>
                     {account === "" ? ("login") : <Account account={account} />}
                 </Button>
@@ -86,7 +114,7 @@ const Layout: FC<LayoutProps> = ({ onConnected, account, children }) => { // siz
             >
                 {children}
             </Flex>
-        </Stack>
+        </Stack >
     );
 };
 

@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import {TypeOrmModule} from "@nestjs/typeorm"
+import { ConfigModule } from '@nestjs/config';
+import allConfig from './config/allConfig';
 @Module({
   imports: [UsersModule, TransactionsModule,
   
@@ -16,7 +18,12 @@ import {TypeOrmModule} from "@nestjs/typeorm"
       database: 'test2',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // TODO: DO NOTT TRUE IN PROD, USE DOTENV or sth
-    })
+    }),
+    ConfigModule.forRoot({
+      envFilePath: [`${__dirname}/config/env/${process.env.NODE_ENV}.env`],
+      load: [allConfig],
+      isGlobal: true,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
