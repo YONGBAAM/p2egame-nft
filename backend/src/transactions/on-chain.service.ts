@@ -1,4 +1,4 @@
-import { CHAIN_RPC_ENDPOINT, web3Wrapper } from '../web3Config'
+import { web3Wrapper } from '../web3Config'
 import { OnChainTransactionStatus } from './dto/on-chain-transaction-status.dto';
 import { TransactionReceipt } from 'web3-eth'
 import { Inject, Logger, NotImplementedException } from '@nestjs/common';
@@ -16,15 +16,23 @@ Unlike transaction service, This is adapter to block chain
 export class OnChainService {
   constructor(
     @Inject(allConfig.KEY) private config: ConfigType<typeof allConfig>,
-
   ) {
     Logger.log(config.chainRpcEndpoint)
     Logger.log(config.contractAddress)
     const wr = new web3Wrapper(config.chainRpcEndpoint, config.contractAddress);
-    this.web3 = wr.web3;
+    this.caver = wr.web3;
+    const keyring = this.caver.wallet.keyring.createFromPrivateKey(this.config.ownerWalletKey);
+
+    this.caver.wallet.add(keyring);
+
     this.contract = wr.nftTokenContract;
+    // this.contract.setWallet(this.caver.keyringContainer())
+    this.contract.options.from = config.ownerWalletAccount;
+    this.contract.options.gas = 3000000;
+
+    console.log(keyring);
   };
-  web3;
+  caver; // TODO: 이거 클래스내부 배리어블 어떻게 하지?
   contract; // web3 contract
 
   private async sendTransaction() {
@@ -35,7 +43,7 @@ export class OnChainService {
     : Promise<OnChainTransactionStatus> {
     try {
       Logger.log("value:" + transactionHash)
-      const result = await this.web3.eth.getTransactionReceipt(transactionHash);
+      const result = await this.caver.klay.getTransactionReceipt(transactionHash);
       const status = new OnChainTransactionStatus();
       if (!result) {
         status.isGood = false;
@@ -51,7 +59,7 @@ export class OnChainService {
 
   async getBlockNumber(): Promise<number> {
     try {
-      const result = await this.web3.eth.getBlockNumber();
+      const result = await this.caver.klay.getBlockNumber();
       return result;
     } catch (error) {
       throw new Error(error)
@@ -73,24 +81,28 @@ export class OnChainService {
   async sendNft(toAccount: string, nftId: number): Promise<TransactionReceipt> {
 
     const nftIdBn = toBN(nftId);
+    console.log(this.config.ownerWalletAccount)
 
-    const tx = await this.contract.methods.safeTransferFrom({
-      from: this.config.ownerWalletAccount,
-      to: toAccount,
-      tokenId: nftIdBn
-    })
+    const tx = await this.contract.methods.safeTransferFrom(
+      this.config.ownerWalletAccount,
+      toAccount,
+      nftIdBn
+    )
 
-    const account = this.web3.eth.accounts.privateKeyToAccount(this.config.ownerWalletKey);
-    const signedRawTx = account.sign(tx);
-    const result = await this.web3.eth.sendSignedTransaction(signedRawTx.rawTransaction);
+    // const result = await this.caver.rpc.klay.sendTransaction(tx);
+    // const keyring = this.caver.wallet.keyring.createFromPrivateKey(this.config.ownerWalletKey);
+    // const signedTx =       keyring.signMessage(tx, this.caver.wallet.keyring.role)
+    // 어 됬네?
+    this.contract.setWallet(this.caver.wallet);
+
+    const signedTx = await this.caver.wallet.sign(this.config.ownerWalletAccount, tx);
+    console.log(signedTx)
+    // this.caver.wallet.sendTransaction()
+    const result = await this.caver.rpc.klay.sendRawTransaction(signedTx);
     return result;
     // TODO: add error handling and logger
     // TODO: wrap error messages since credentials could be exposed
-
-
-
   }
-
 
   // TODO: Unify this two
 
