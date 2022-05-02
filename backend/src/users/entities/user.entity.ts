@@ -12,6 +12,9 @@ export class User {
   @Column("float")
   gold: number = 0.0;
 
-  @Column()
+  @Column("int")
   score: number = 0;
+
+  @Column("int")
+  withdrawed_score:number = 0;
 }

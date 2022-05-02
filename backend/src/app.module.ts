@@ -7,6 +7,7 @@ import {TypeOrmModule} from "@nestjs/typeorm"
 import { ConfigModule } from '@nestjs/config';
 import allConfig from './config/allConfig';
 import * as Joi from 'joi';
+import config from 'ormconfig';
 @Module({
   imports: [UsersModule, TransactionsModule,
     ConfigModule.forRoot({
@@ -25,20 +26,13 @@ import * as Joi from 'joi';
           CHAIN_OWNER_ACCOUNT:Joi.string()
           .required(),
           CHAIN_CONTRACT_ADDRESS:Joi.string()
-          .required()
+          .required(),
+          NFT_DB_SYNCHRONIZE: Joi.string()
+          .required(),
 
       })
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.NFT_DB_HOST,
-      port: 5432,
-      username: process.env.NFT_DB_USERNAME,
-      password: ""+process.env.NFT_DB_PASSWORD,
-      database: process.env.NFT_DB_DATABASE,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: (process.env.NFT_DB_SYNCHRONIZE === "true") ? true:false, // TODO: DO NOTT TRUE IN PROD, USE DOTENV or sth
-    }),
+    TypeOrmModule.forRoot(),
     
   ],
   controllers: [AppController],
