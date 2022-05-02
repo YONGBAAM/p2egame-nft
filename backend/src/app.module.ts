@@ -7,11 +7,11 @@ import {TypeOrmModule} from "@nestjs/typeorm"
 import { ConfigModule } from '@nestjs/config';
 import allConfig from './config/allConfig';
 import * as Joi from 'joi';
-import config from 'ormconfig';
 @Module({
   imports: [UsersModule, TransactionsModule,
-    ConfigModule.forRoot({
-      envFilePath: [`${__dirname}/config/env/${process.env.NODE_ENV}.env`],
+    ConfigModule.forRoot(
+      {
+      envFilePath: [`.${process.env.NODE_ENV}.env`],
       load: [allConfig],
       isGlobal: true,
       validationSchema: Joi.object({
@@ -31,8 +31,21 @@ import config from 'ormconfig';
           .required(),
 
       })
-    }),
-    TypeOrmModule.forRoot(),
+    }
+    ),
+    TypeOrmModule.forRoot(
+      {
+        type: 'postgres',
+        host: process.env.NFT_DB_HOST,
+        port: 5432,
+        username: process.env.NFT_DB_USERNAME,
+        password: process.env.NFT_DB_PASSWORD,
+        database: process.env.NFT_DB_DATABASE,
+        entities: [__dirname + '/**/*.entity.{js,ts}'],
+        synchronize: (process.env.NFT_DB_SYNCHRONIZE === "true") ? true:false, // TODO: DO NOTT TRUE IN PROD, USE DOTENV or sth
+        logging: process.env.NODE_ENV !== 'production',
+      }
+    ),
     
   ],
   controllers: [AppController],

@@ -6,9 +6,7 @@ import { Inject, Injectable } from '@nestjs/common';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService,
-    @Inject(allConfig.KEY) private config: ConfigType<typeof allConfig>,
-    ) {}
+  constructor(private readonly appService: AppService) {}
 
   @Get("/")
   getHello(): string {
