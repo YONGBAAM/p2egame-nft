@@ -52,8 +52,13 @@ export class UsersService {
       user.items = [];
     }
     for (const itemDto of itemsDto.items) {  // in 은 인덱스, of가 'in'
-      const itemEntity =
+      const idx = user.items.findIndex((e,i,a) => e.nft_id === itemDto.nft_id)
+      if (idx === -1) {
         user.items.push(new Item(itemDto.nft_id, itemDto.attributes));
+      }
+      else {
+        user.items[idx].lot +=1;
+      }
     }
     user.gold = user.gold + itemsDto.gold;
     Logger.log(user.toString())
@@ -62,35 +67,25 @@ export class UsersService {
 
   async deleteAllItems(walletAddress: string, deleteItemsDto: UpdateItemsDto) {
     const user = await this.findUser(walletAddress);
-
+    
     if (user.gold < deleteItemsDto.gold) {
       throw new MethodNotAllowedException("user does not have items");
     }
+    user.gold = user.gold - deleteItemsDto.gold;
 
-    var haveAllItems = true;
-    const currentItemNftIds = user.items.map(x => x.nft_id);
-    const itemIdsToDelete = deleteItemsDto.items.map(x => x.nft_id);
-
-
-    Logger.log("items" + itemIdsToDelete.join(","));
-    const newitems: Item[] = [];
-    Logger.log(currentItemNftIds.join(","))
-    for (const item of deleteItemsDto.items) {
-      if (!currentItemNftIds.includes(item.nft_id)) {
-        haveAllItems = false;
-        throw new MethodNotAllowedException("user does not have items");
+    for (const itemDto of deleteItemsDto.items) {  // in 은 인덱스, of가 'in'
+      const idx = user.items.findIndex((e,i,a) => e.nft_id === itemDto.nft_id)
+      if (idx === -1) {
+        throw new Error("User Not have All Items: " + itemDto.nft_id)
       }
-
+      else {
+        user.items[idx].lot -=itemDto.lot;
+      }
     }
 
-    const newUserItems = user.items
-      .filter(itemEntity => !itemIdsToDelete.includes(itemEntity.nft_id))
+    user.items = user.items.filter(item => item.lot>0)
 
-    // TODO: query runner and refactoring
-    user.gold = user.gold - deleteItemsDto.gold;
-    user.items = newUserItems
     this.userRepository.save(user)
-
   }
 
   async findTopScoreUser(): Promise<User> {

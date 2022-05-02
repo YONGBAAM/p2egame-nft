@@ -689,19 +689,26 @@ const CONTRACT_ABI: AbiItem[] = [
 	;
 
 export class web3Wrapper {
-	constructor(chainRpcEndpoint: string, contractAddress: string) {
+	constructor(chainRpcEndpoint: string, contractAddress: string, ownerWalletAccount:string, ownerWalletKey:string) {
 		// @ts-ignore
-		this.web3 = new Caver('https://api.baobab.klaytn.net:8651/');
+		this.caver = new Caver('https://api.baobab.klaytn.net:8651/');
+		const keyring = this.caver.wallet.keyring.createFromPrivateKey(ownerWalletKey);
+    this.caver.wallet.add(keyring);
+
 		
 		// this.web3 = new Web3(new Web3.providers
 			// .HttpProvider(chainRpcEndpoint));
 
 		// migrate this!
-		this.nftTokenContract = new this.web3.klay.Contract(CONTRACT_ABI, contractAddress);
+		this.nftTokenContract = new this.caver.klay.Contract(CONTRACT_ABI, contractAddress);
+		this.nftTokenContract.options.from = ownerWalletAccount;
+    this.nftTokenContract.options.gas = 3000000;
+    this.nftTokenContract.setWallet(this.caver.wallet);
+
 
 	};
 	
-	web3:any;
+	caver:any;
 	nftTokenContract:any;
 
 }

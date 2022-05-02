@@ -1,6 +1,6 @@
 import { web3Wrapper } from '../web3Config'
 import { OnChainTransactionStatus } from './dto/on-chain-transaction-status.dto';
-import { TransactionReceipt } from 'web3-eth'
+// import { TransactionReceipt } from 'web3-eth'
 import { Inject, Logger, NotImplementedException } from '@nestjs/common';
 import { toBN } from 'web3-utils';
 import path from 'path';
@@ -8,6 +8,7 @@ import * as fs from "fs"
 import { ItemMetadata } from 'src/users/dto/item-metadata';
 import { ConfigType } from '@nestjs/config';
 import allConfig from 'src/config/allConfig';
+import { TransactionReceipt } from 'caver-js';
 // import Web3 from 'web3';
 
 /*
@@ -19,18 +20,11 @@ export class OnChainService {
   ) {
     Logger.log(config.chainRpcEndpoint)
     Logger.log(config.contractAddress)
-    const wr = new web3Wrapper(config.chainRpcEndpoint, config.contractAddress);
-    this.caver = wr.web3;
-    const keyring = this.caver.wallet.keyring.createFromPrivateKey(this.config.ownerWalletKey);
-
-    this.caver.wallet.add(keyring);
-
+    const wr = new web3Wrapper(config.chainRpcEndpoint, config.contractAddress, 
+      config.ownerWalletAccount, config.ownerWalletKey);
+    this.caver = wr.caver;
     this.contract = wr.nftTokenContract;
     // this.contract.setWallet(this.caver.keyringContainer())
-    this.contract.options.from = config.ownerWalletAccount;
-    this.contract.options.gas = 3000000;
-
-    console.log(keyring);
   };
   caver; // TODO: 이거 클래스내부 배리어블 어떻게 하지?
   contract; // web3 contract
@@ -93,7 +87,6 @@ export class OnChainService {
     // const keyring = this.caver.wallet.keyring.createFromPrivateKey(this.config.ownerWalletKey);
     // const signedTx =       keyring.signMessage(tx, this.caver.wallet.keyring.role)
     // 어 됬네?
-    this.contract.setWallet(this.caver.wallet);
 
     const signedTx = await this.caver.wallet.sign(this.config.ownerWalletAccount, tx);
     console.log(signedTx)

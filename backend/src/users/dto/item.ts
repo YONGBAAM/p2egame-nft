@@ -11,5 +11,6 @@ export class Item {
     this.attributes = attributes;
   }
   nft_id: number; 
-  attributes:Attribute[]
+  attributes:Attribute[];
+  lot:number = 1;
 }
