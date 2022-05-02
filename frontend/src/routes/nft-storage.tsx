@@ -4,15 +4,18 @@ import { mintAnimalTokenContract} from "../web3Config";
 import { Flex, Grid } from '@chakra-ui/layout';
 import { Button } from '@chakra-ui/button';
 import NftCard from '../components/NftCard';
+import { Contract } from 'caver-js';
 
 
 interface NftStorageProps {
-    account:string
+    account:string;
+    contract?:Contract;
 }
 
-const NFTStorage:FC<NftStorageProps> = ({account}) => {
+const NFTStorage:FC<NftStorageProps> = (props) => {
     const [cardArray, setCardArray] = useState<ICardProps[]>([]);
-
+    const account = props.account;
+    const contract = props.contract;
     const getAnimalTokens = async () => {
         try {
             const balanceLength = await mintAnimalTokenContract.methods
@@ -58,6 +61,7 @@ const NFTStorage:FC<NftStorageProps> = ({account}) => {
                         nftId={v.nftId}
                         type={v.type}
                         account={account}
+                        contract={contract}
                     />
                 );
             })}

@@ -1,16 +1,53 @@
 import { Button } from '@chakra-ui/button'
 import { Box } from '@chakra-ui/layout'
+import Caver, { Contract } from 'caver-js'
 import React, { FC } from 'react'
+import { nftAbi, nftAddress,  } from '../web3Config'
 import CharacterCard, { ICardProps } from './CharacterCard'
 
 interface NftCardProps extends ICardProps {
-    account:string
+    account:string,
+    contract?:Contract
  };
 
 const NftCard: FC<NftCardProps> = (props) => {
+    const account = props.account;
+    const id = props.nftId;
+    const contract = props.contract;
+    const changgoAddress = process.env.REACT_APP_OWNER_ACCOUNT_ADDRESS;
 
-    const onClickDeposit = () => {
+    const onClickDeposit = async () => {
+        try {
 
+            // FIrst safe transfer in NFT space
+            console.log("to game")
+            if (!contract){
+                console.log("contract: " + contract)
+                return;
+            }
+            console.log(contract)
+
+            const estimateGas = 
+            await contract.methods
+            .safeTransferFrom(account, process.env.REACT_APP_OWNER_ACCOUNT_ADDRESS, props.nftId )
+            .estimateGas({ from: account,
+                gas: 6000000
+            })
+
+            console.log(account, changgoAddress, id)
+            const result = await contract.methods
+            .safeTransferFrom(
+                account, changgoAddress, id
+            )
+            .send({from:account, gas:estimateGas});
+
+            console.log(result)
+            console.log(result.transactionHash)
+
+
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (

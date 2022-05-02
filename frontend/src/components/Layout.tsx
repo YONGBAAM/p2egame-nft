@@ -2,14 +2,17 @@ import React, { FC, useEffect, useState } from "react";
 import { Stack, Flex, Box, Text, Button } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import Account from "./Account";
+import Caver from "caver-js";
+import { nftAbi, nftAddress } from "../web3Config";
 
 interface LayoutProps {
     onConnected: Function;
+    setContract:Function;
     account: string;
     children: React.ReactNode;
 }
 
-const Layout: FC<LayoutProps> = ({ onConnected, account, children }) => { // size  = " 하면 이렇게 자동완성 나오네
+const Layout: FC<LayoutProps> = ({ onConnected, setContract, account, children }) => { // size  = " 하면 이렇게 자동완성 나오네
 
     const connect = async (onConnected: Function) => {
         if (!window.klaytn) {
@@ -20,6 +23,11 @@ const Layout: FC<LayoutProps> = ({ onConnected, account, children }) => { // siz
         const accounts = await window.klaytn.enable();
         console.log("account:" + accounts[0])
         onConnected(accounts[0]);
+        const caver = new Caver(window.klaytn);
+        const myc = new caver.klay.Contract(nftAbi, nftAddress);
+        setContract(myc)
+        console.log(myc)
+
         updateSession()
     }
 
@@ -39,6 +47,9 @@ const Layout: FC<LayoutProps> = ({ onConnected, account, children }) => { // siz
 
         console.log("account:" + accounts[0])
         onConnected(accounts[0]);
+        const caver = new Caver(window.klaytn);
+        const myc = new caver.klay.Contract(nftAbi, nftAddress);
+        setContract(myc)
         updateSession()
     };
 

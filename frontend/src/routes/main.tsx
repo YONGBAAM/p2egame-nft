@@ -1,18 +1,19 @@
 import { Button } from '@chakra-ui/button';
 import { Box, Flex, Text } from '@chakra-ui/layout';
-import Caver from 'caver-js';
+import Caver, { Contract } from 'caver-js';
 import React, { FC, useState } from 'react'
 import { mintAnimalTokenContract , nftAbi, nftAddress} from '../web3Config';
 
 interface mainProps {
     account: string;
+    contract?:Contract;
 }
 
-const Main: FC<mainProps> = ({
-    account
-}) => {
+const Main: FC<mainProps> = (props) => {
     const [txidMessage, setTxidMessage] = useState<string>("")
     const [displayMessage, setDisplayMessage] = useState<string>("Let's mint token")
+    const account = props.account;
+    var contract = props.contract;
 
     // TODO: What function type?
     const onClickMint = async (setTxidMessage:any, setDisplayMessage:any) => {
@@ -20,18 +21,16 @@ const Main: FC<mainProps> = ({
         try {
             if (!account) console.error("err")
             console.log(account);
-            
-            const caver = new Caver(window.klaytn);
-            
-            console.log(caver.klay.getBalance(account))
-        
-            const myc = new caver.klay.Contract(nftAbi, nftAddress);
-            const estimateGas = await myc.methods.mint(1).estimateGas({ from: account,
+            if (!contract) return;
+
+            // NOTE:::: THIS VALUE NEED TO BE SET! with payable!!
+            const estimateGas = await contract.methods.mint(1)
+            .estimateGas({ from: account,
                 gas: 6000000,
-                value: "0x2386f26fc10000"
+                value: "0x16345785d8a0000"
             })
             console.log(estimateGas)
-            await myc.methods.mint(1).send({from:account, gas:estimateGas, value:"0x2386f26fc10000"});
+            await contract.methods.mint(1).send({from:account, gas:estimateGas, value:"0x16345785d8a0000"});
 
 
 
