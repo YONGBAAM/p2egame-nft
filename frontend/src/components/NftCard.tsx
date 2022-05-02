@@ -47,7 +47,7 @@ const NftCard: FC<NftCardProps> = (props) => {
 
             if (result.transactionHash) {
                 const response = await 
-                    axios.put( "/inventory/" + account + "/items/" + id)
+                    axios.put( "/api/inventory/" + account + "/items/" + id)
                 console.log("add item: " + response)
 
             }

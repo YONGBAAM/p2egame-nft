@@ -16,13 +16,13 @@ const NftCard: FC<GameCardProps> = (props) => {
     const onClickRetrieval = async () => {
         setActivated(false)
         const result = await axios
-        .post( "/transactions/on-chain/nft", {"toAccount":account, "nftId":nftId});
+        .post( "/api/transactions/on-chain/nft", {"toAccount":account, "nftId":nftId});
         console.log(result);   
         if (result.data.transactionHash) {
             
         }
         
-        const result2 = await axios.delete("inventory/" + account + "/items/" + nftId)
+        const result2 = await axios.delete("/api/inventory/" + account + "/items/" + nftId)
         console.log(result2)
         
     }
