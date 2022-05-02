@@ -27,6 +27,14 @@
 		"Custom": {
 			"linkReferences": {},
 			"autoDeployLib": true
+		},
+		"cypress:8217": {
+			"linkReferences": {},
+			"autoDeployLib": true
+		},
+		"baobab:1001": {
+			"linkReferences": {},
+			"autoDeployLib": true
 		}
 	},
 	"data": {

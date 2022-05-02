@@ -66,7 +66,7 @@ const Layout: FC<LayoutProps> = ({ onConnected, setContract, account, children }
                 alignItems="center"
             >
                 <Box>
-                    <Text fontWeight="bold">h662-Animals</Text>
+                    <Text fontWeight="bold">Under The Sea</Text>
                 </Box>
 
                 <Link to="/">
@@ -87,21 +87,6 @@ const Layout: FC<LayoutProps> = ({ onConnected, setContract, account, children }
 
                     <Button size="sm" colorScheme="blue">
                         GAME-Storage
-                    </Button>
-                </Link>
-
-                <Link to={{ pathname: "game" }} target="_top">
-
-                    <Button size="sm" colorScheme="blue">
-                        GAME
-                    </Button>
-                </Link>
-
-
-                <Link to="/game">
-
-                    <Button size="sm" colorScheme="blue">
-                        GAME2
                     </Button>
                 </Link>
                 <Button size="sm" colorScheme="blue" onClick = {() => {

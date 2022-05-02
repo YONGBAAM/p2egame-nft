@@ -5,7 +5,7 @@ import { Logger } from "@nestjs/common";
 import { AbiItem } from "caver-js";
 import * as Caver from "caver-js" // 뭔 차이지?
 
-const CONTRACT_ABI: AbiItem[] = [
+const CONTRACT_ABI: AbiItem[] =[
 	{
 		"inputs": [
 			{
@@ -129,6 +129,25 @@ const CONTRACT_ABI: AbiItem[] = [
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "addInfo",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "to",
 				"type": "address"
@@ -206,6 +225,24 @@ const CONTRACT_ABI: AbiItem[] = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "v",
+				"type": "uint256"
+			}
+		],
+		"name": "increaseAddInfo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -429,6 +466,24 @@ const CONTRACT_ABI: AbiItem[] = [
 			}
 		],
 		"name": "safeTransferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "v",
+				"type": "uint256"
+			}
+		],
+		"name": "setAddInfo",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -679,6 +734,37 @@ const CONTRACT_ABI: AbiItem[] = [
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_owner",
+				"type": "address"
+			}
+		],
+		"name": "walletOfOwnerV2",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "other",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct NFT.nftData[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "withdraw",
 		"outputs": [],
@@ -691,7 +777,7 @@ const CONTRACT_ABI: AbiItem[] = [
 export class web3Wrapper {
 	constructor(chainRpcEndpoint: string, contractAddress: string, ownerWalletAccount:string, ownerWalletKey:string) {
 		// @ts-ignore
-		this.caver = new Caver('https://api.baobab.klaytn.net:8651/');
+		this.caver = new Caver(chainRpcEndpoint);
 		const keyring = this.caver.wallet.keyring.createFromPrivateKey(ownerWalletKey);
     this.caver.wallet.add(keyring);
 
