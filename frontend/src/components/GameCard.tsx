@@ -24,12 +24,13 @@ const NftCard: FC<GameCardProps> = (props) => {
         
         const result2 = await axios.delete("inventory/" + account + "/items/" + nftId)
         console.log(result2)
+        
     }
 
     return (
         <Box textAlign="center" w={150} >
             <CharacterCard nftId={props.nftId} type={props.type} lot = {props.lot}/>
-            <Button isActive={activated} size="sm" colorScheme="blue" mt={2} onClick={onClickRetrieval} display="inline-block">
+            <Button disabled={!activated} size="sm" colorScheme="blue" mt={2} onClick={onClickRetrieval} display="inline-block">
                 to NFT
             </Button>
         </Box>
