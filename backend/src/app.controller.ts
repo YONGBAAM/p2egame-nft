@@ -10,7 +10,7 @@ export class AppController {
     @Inject(allConfig.KEY) private config: ConfigType<typeof allConfig>,
     ) {}
 
-  @Get("/hello")
+  @Get("/")
   getHello(): string {
     return this.appService.getHello();
   }

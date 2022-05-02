@@ -5,6 +5,7 @@ import { Repository } from "typeorm"
 import { User } from './entities/user.entity';
 import { UpdateItemsDto } from './dto/update-items.dto';
 import { Item } from './dto/item';
+import { json } from 'express';
 
 
 /*
@@ -20,6 +21,7 @@ export class UsersService {
 
   // 여기서 jwt 리턴해주고, 게임 로그인시 밸리데이트
   async findUserOrCreate(walletAddress: string): Promise<User> {
+    walletAddress = walletAddress.toLowerCase();
     var user = await this.userRepository.findOne({ walletAddress: walletAddress })
     if (user == undefined) {
       const newUser = new User();
@@ -32,15 +34,13 @@ export class UsersService {
   }
 
   async findUser(walletAddress: string): Promise<User> {
-    const user = this.userRepository
-      .findOne({ where: { walletAddress }})
-
-    if (user === undefined) { throw new Error("user not found: " + walletAddress) }
-    return user;
+    return this.findUserOrCreate(walletAddress);
   }
 
   async getAllItems(walletAddress: string): Promise<UpdateItemsDto> {
     const user = await this.findUser(walletAddress);
+    Logger.log(JSON.stringify(user))
+    
 
     const returnItemsDto = new UpdateItemsDto(user.gold, user.items);
     return returnItemsDto;

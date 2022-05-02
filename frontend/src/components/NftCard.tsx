@@ -1,5 +1,6 @@
 import { Button } from '@chakra-ui/button'
 import { Box } from '@chakra-ui/layout'
+import axios from 'axios'
 import Caver, { Contract } from 'caver-js'
 import React, { FC } from 'react'
 import { nftAbi, nftAddress,  } from '../web3Config'
@@ -43,6 +44,13 @@ const NftCard: FC<NftCardProps> = (props) => {
 
             console.log(result)
             console.log(result.transactionHash)
+
+            if (result.transactionHash) {
+                const response = await 
+                    axios.put( "/inventory/" + account + "/items/" + id)
+                console.log("add item: " + response)
+
+            }
 
 
         } catch (error) {
