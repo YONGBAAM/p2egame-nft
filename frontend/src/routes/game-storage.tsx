@@ -31,7 +31,7 @@ const GameStorage:FC<gameStorageProps> = ({
 
     const getItemList =  async () => {
         try {
-            const response = await axios.get( "/inventory/" + account)
+            const response = await axios.get( "/api/inventory/" + account)
             const tt: ICardProps[] = [];
             console.log(response)
             response.data['items'].map((v: iitem) => {
