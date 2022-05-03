@@ -70,13 +70,7 @@ const NFTStorage:FC<NftStorageProps> = (props) => {
         getAnimalTokens();
     }, [account]
     );
-
-    useEffect(() => {
-      if (myAllScore< myUsedScore + 100) {
-        setButtonDisabled(true)
-      }      
-    }, [myAllScore, myUsedScore])
-
+    
     useEffect(() => {
       if (!account) return;
       getUsedScore();
@@ -103,7 +97,7 @@ const NFTStorage:FC<NftStorageProps> = (props) => {
                         level = {v.level}
                         onClick = {onClick}
                         setMessage = {setDisplayMessage}
-                        isButtonDisabled = {buttonDisabled}
+                        isButtonDisabled = {myAllScore< myUsedScore + 100}
                     />
                 );
             })}
