@@ -17,7 +17,7 @@ const Layout: FC<LayoutProps> = ({ onConnected, setContract, account, children }
 
     const connect = async (onConnected: Function) => {
         if (!window.klaytn) {
-            alert("Get MetaMask!");
+            alert("Get KaiKas!");
             return;
         }
 
@@ -29,14 +29,13 @@ const Layout: FC<LayoutProps> = ({ onConnected, setContract, account, children }
         setContract(myc)
         console.log(myc)
 
-        updateSession()
     }
 
-    const updateSession = async () => {
-        localStorage.setItem("phaser_game_account", account)
-        const ss = localStorage.getItem("phaser_game_account")
-        console.log("session: " + ss)
-    }
+    // const updateSession = async () => {
+    //     localStorage.setItem("phaser_game_account", account)
+    //     const ss = localStorage.getItem("phaser_game_account")
+    //     console.log("session: " + ss)
+    // }
 
     // At first login, check if connected.
     const checkConnected = async (onConnected: Function) => {
@@ -51,8 +50,16 @@ const Layout: FC<LayoutProps> = ({ onConnected, setContract, account, children }
         const caver = new Caver(window.klaytn);
         const myc = new caver.klay.Contract(nftAbi, nftAddress);
         setContract(myc)
-        updateSession()
     };
+
+    useEffect(() => {
+        window.klaytn.on('accountsChanged', function() {
+    	// kaikas에서 계정을 변경할 때 마다 내부의 함수가 실행됩니다.
+    	console.log("Account changed");
+        checkConnected(onConnected);
+
+    })
+    }, []);
 
     useEffect(() => {
         checkConnected(onConnected);

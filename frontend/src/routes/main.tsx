@@ -1,8 +1,10 @@
 import { Button } from '@chakra-ui/button';
 import { Box, Flex, Text } from '@chakra-ui/layout';
-import Caver, { Contract } from 'caver-js';
-import React, { FC, useState } from 'react'
-import { mintAnimalTokenContract , nftAbi, nftAddress} from '../web3Config';
+import Caver, { Contract,} from 'caver-js';
+import React, { FC, useEffect, useState } from 'react'
+import {fromWei} from "web3-utils"
+import CharacterCard from '../components/CharacterCard';
+import { caver, mintAnimalTokenContract , nftAbi, nftAddress} from '../web3Config';
 
 interface mainProps {
     account: string;
@@ -11,77 +13,88 @@ interface mainProps {
 
 const Main: FC<mainProps> = (props) => {
     const [txidMessage, setTxidMessage] = useState<string>("")
-    const [displayMessage, setDisplayMessage] = useState<string>("Let's mint token")
+    const [costInEther, setCostInEther] = useState<string>("0");
+    const [lastMintNftId, setLastMintNftId] = useState<number>(0);
+
     const account = props.account;
-    var contract = props.contract;
+    const  contract = props.contract;
+
+    const getMintValueInBN = async () => {
+        try {
+            if (contract === undefined) {
+                console.error("No contract is injected")
+                return;
+            }
+            const costInBn = await contract.methods.cost().call();
+            return costInBn;
+        } catch (error) {
+            console.error(error);
+        }
+
+    }
+
+    const updateCostInEther = async () => {
+        try {
+            const costInBn = await getMintValueInBN();
+            if (costInBn === undefined) {return}
+            costInBn && setCostInEther(fromWei(costInBn))
+            console.log(fromWei(costInBn))
+            // costInBn && setCostInEther(Caver.utils.fromWei(costInBn).toNumber())
+    
+        } catch (error) {
+         console.error(error)   
+        }
+
+    }
+
+    useEffect(() => {
+        updateCostInEther();
+    }, [contract]) // contract가 변할때마다 실행됨
 
     // TODO: What function type?
-    const onClickMint = async (setTxidMessage:any, setDisplayMessage:any) => {
+    const onClickMint = async (setTxidMessage:any) => {
 
         try {
             if (!account) console.error("err")
             console.log(account);
             if (!contract) return;
+            
+            const mintValue = await getMintValueInBN();
 
             // NOTE:::: THIS VALUE NEED TO BE SET! with payable!!
             const estimateGas = await contract.methods.mint(1)
             .estimateGas({ from: account,
                 gas: 6000000,
-                value: "0x16345785d8a0000"
+                value: mintValue
             })
             console.log(estimateGas)
-            await contract.methods.mint(1).send({from:account, gas:estimateGas, value:"0x16345785d8a0000"});
+            await contract.methods.mint(1)
+            .send({from:account, gas:estimateGas, value:mintValue});
 
-
-
-            // const cont = caver.contract.create(nftAbi, nftAddress, {from:account, gas:"0x70791"})
-            // const tx = cont.methods.mint(1);
-            // tx.from = account;
-            // const klaytn = window.klaytn;
-            // // console.log(tx)
-            // // window.klaytn.sendAsync(tx)
+            const wallets = await mintAnimalTokenContract.methods
+            .walletOfOwnerV2(account)
+            .call();
             
-            // const transactionParameters = {
-            //     to: nftAddress,
-            //     from: account,
-            //     data: "0xa0712d680000000000000000000000000000000000000000000000000000000000000002",
-            //     value: "0x16345785D8A0000",
-            //     gas:"0x70791"
-
-            //   };
-            
-            //   // 하고 싶은 일 블록체인에 요청하기
-            //   klaytn.sendAsync(
-            //     {
-            //       method: "klay_sendTransaction",
-            //       params: [transactionParameters, "latest"],
-            //       from: account
-            //     },
-            //     (receipt:any, result:any) => {
-            //       console.log(receipt);
-            //       console.log(result.result);
-            //     setTxidMessage(result.result)
-            //     // const response:number[] = await mintAnimalTokenContract.methods
-            //     // .walletOfOwner(account)
-            //     // .call();
-            //     // setDisplayMessage(`ID: ${response[response.length-1]}, Your NFT Count: ${response.length}`)
-
-            //     }
-            //   );
-            
+            setLastMintNftId(wallets[wallets.length-1]['id'])
 
         } catch (error) {
             console.error(error)
         }
     };
+    
 
     return ( // TODO: Add address for query txid
         <Flex w="full" h="100vh"
             justifyContent="center" alignItems="center" direction="column">
-            <Button mt={4} size="sm" colorScheme="blue" onClick={() => onClickMint(setTxidMessage, setDisplayMessage)}>mint</Button>
+            <Text>{`Mint Cost: ${costInEther} Klay`}</Text>
+            <Text>{`Please Install Kaikas and login`}</Text>
+            <Button mt = {6} mb = {6} size="lg" colorScheme="blue" 
+            onClick={() => onClickMint(setTxidMessage)}>
+                mint
+                </Button>
             <Box alignItems = "center">
                 <Text> {txidMessage && "txid: " +  txidMessage}</Text>
-                <Text alignItems = "center"> {displayMessage}</Text>
+                {lastMintNftId !==0? <CharacterCard nftId = {lastMintNftId} type = {0} /> : <Text>Let's mint Card</Text>}
             </Box>
         </Flex>
     )

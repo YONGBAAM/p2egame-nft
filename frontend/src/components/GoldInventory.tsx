@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-
+import {Text} from "@chakra-ui/react"
 interface GoldInventoryProps {
   ganghwaCost:number;
   
@@ -14,7 +14,7 @@ const GoldInventory:FC<GoldInventoryProps> = (props:GoldInventoryProps) => {
   const myScore = props.myScore;
   const displayMessage = props.displayMessage? props.displayMessage : "";
   return (
-    <div>{`+1=${ganghwaCost} ${usedScore}/${myScore} ${displayMessage}`}</div>
+    <Text>{`Cost=${ganghwaCost} Used ${usedScore}/${myScore} ${displayMessage}`}</Text>
   )
 }
 

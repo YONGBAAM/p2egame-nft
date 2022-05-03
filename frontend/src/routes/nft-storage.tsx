@@ -32,7 +32,7 @@ const NFTStorage:FC<NftStorageProps> = (props) => {
 
             const tempAnimalCardArray: ICardProps[] = [];
 
-            const response:number[] = await mintAnimalTokenContract.methods
+            const response = await mintAnimalTokenContract.methods
                 .walletOfOwnerV2(account)
                 .call();
             
