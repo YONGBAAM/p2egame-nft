@@ -3,10 +3,6 @@ import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { OnChainService } from './on-chain.service';
 
-interface sendNftDto {
-  toAccount: string;
-  nftId: number;
-}
 
 @Controller('transactions')
 export class TransactionsController {
@@ -42,11 +38,7 @@ export class TransactionsController {
     return this.onChainService.queryNftMetaData(nftId);
   }
 
-  // Not tested yet.
-  @Post("on-chain/nft")
-  async sendNft(@Body() dto: sendNftDto) {
-    return this.onChainService.sendNft(dto.toAccount, dto.nftId);
-  }
+
 
   // find all pending
 

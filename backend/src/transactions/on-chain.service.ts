@@ -78,8 +78,8 @@ export class OnChainService {
     }
   }
 
-  async sendNft(toAccount: string, nftId: number): Promise<TransactionReceipt> {
-
+  async rawSendNft(toAccount: string, nftId: number): Promise<TransactionReceipt> {
+    
     const nftIdBn = toBN(nftId);
     console.log(this.config.ownerWalletAccount)
 

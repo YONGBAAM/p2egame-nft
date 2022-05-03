@@ -775,7 +775,7 @@ export const nftAbi:AbiItem[] =
 export const nftAddress = process.env.REACT_APP_CONTRACT_DEPLOYED_ADDRESS;
 
 export const caver = new Caver(
-	"https://public-node-api.klaytnapi.com/v1/cypress"
+	process.env.REACT_APP_KLAYTN_ENDPOINT
 	);
 
 export const mintAnimalTokenContract = caver.contract.create(

@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateItemsDto } from './dto/update-items.dto';
 import { Item } from './dto/item';
 import { OnChainService } from 'src/transactions/on-chain.service';
+import { sendNftDto } from 'src/transactions/dto/send-nft-dto';
 
 
 // NOTE: This is raw update of items. 
@@ -63,6 +64,17 @@ export class UsersController {
     @Body() updateItemsDto: UpdateItemsDto
   ) {
     return this.usersService.addAllItems(wallet, updateItemsDto)
+  }
+
+  // Not tested yet.
+  @Post("transactions/on-chain/nft")
+  async sendNft(@Body() dto: sendNftDto) {
+    const user = await this.usersService.findUser(dto.toAccount);
+    const haveNftIds = user.items.map(item => item.nft_id);
+    if (!haveNftIds.includes(dto.nftId)) {
+      throw new Error("user not have item in account: " + dto.nftId);
+    }
+    return this.onChainService.rawSendNft(dto.toAccount, dto.nftId);
   }
 
 
