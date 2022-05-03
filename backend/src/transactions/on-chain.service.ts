@@ -9,11 +9,15 @@ import { ItemMetadata } from 'src/users/dto/item-metadata';
 import { ConfigType } from '@nestjs/config';
 import allConfig from 'src/config/allConfig';
 import { TransactionReceipt } from 'caver-js';
+import { time } from 'console';
+import { UsersService } from 'src/users/users.service';
+import { GameService } from 'src/users/game.service';
 // import Web3 from 'web3';
 
 /*
 Unlike transaction service, This is adapter to block chain
 */
+
 export class OnChainService {
   constructor(
     @Inject(allConfig.KEY) private config: ConfigType<typeof allConfig>,
@@ -28,6 +32,8 @@ export class OnChainService {
   };
   caver; // TODO: 이거 클래스내부 배리어블 어떻게 하지?
   contract; // web3 contract
+
+
 
   private async sendTransaction() {
 
@@ -97,6 +103,40 @@ export class OnChainService {
     // TODO: wrap error messages since credentials could be exposed
   }
 
+  async getLevelOfNft(nftId:number):Promise<number> {
+
+    const nftIdBn = toBN(nftId);
+    
+    const result = await this.contract.methods.addInfo(
+      nftIdBn
+    ).call();
+    Logger.log(result);
+    return result;
+  }
+
+  async sendTransactionWithSign(tx:any):Promise<TransactionReceipt> {
+    const signedTx = await this.caver.wallet.sign(this.config.ownerWalletAccount, tx);
+    console.log(signedTx)
+    // this.caver.wallet.sendTransaction()
+    const result = await this.caver.rpc.klay.sendRawTransaction(signedTx);
+    return result;
+  }
+
+  async increaseLevelOfNft(nftId:number, v:number) {
+
+    const nftIdBn = toBN(nftId);
+    console.log(this.config.ownerWalletAccount)
+    const tx = await this.contract.methods.increaseAddInfo(
+      nftIdBn, v
+    )
+    return this.sendTransactionWithSign(tx)
+
+    // const result = await this.caver.rpc.klay.sendTransaction(tx);
+    // const keyring = this.caver.wallet.keyring.createFromPrivateKey(this.config.ownerWalletKey);
+    // const signedTx =       keyring.signMessage(tx, this.caver.wallet.keyring.role)
+    // 어 됬네?
+  }
+
   // TODO: Unify this two
 
   // query metadat for NFT by ID
@@ -116,6 +156,8 @@ export class OnChainService {
     }
     throw new NotImplementedException();
   }
+
+  
 
   async queryNftOwner(nftId: number) {
     throw new NotImplementedException();

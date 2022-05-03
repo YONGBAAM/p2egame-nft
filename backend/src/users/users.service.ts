@@ -6,6 +6,8 @@ import { User } from './entities/user.entity';
 import { UpdateItemsDto } from './dto/update-items.dto';
 import { Item } from './dto/item';
 import { json } from 'express';
+import { GameService, GANGHWA_COST } from './game.service';
+import { OnChainService } from 'src/transactions/on-chain.service';
 
 
 /*
@@ -16,8 +18,12 @@ Please Refactor
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>
-  ) { };
+    @InjectRepository(User) private userRepository: Repository<User>,
+    private readonly onChainService:OnChainService
+  ) {
+
+
+   };
 
   // 여기서 jwt 리턴해주고, 게임 로그인시 밸리데이트
   async findUserOrCreate(walletAddress: string): Promise<User> {
@@ -27,6 +33,7 @@ export class UsersService {
       const newUser = new User();
       newUser.walletAddress = walletAddress;
       newUser.items = []
+      newUser.withdrawed_score = -1000;
       await this.userRepository.save(newUser);
       return newUser;
     }
@@ -35,6 +42,10 @@ export class UsersService {
 
   async findUser(walletAddress: string): Promise<User> {
     return this.findUserOrCreate(walletAddress);
+  }
+
+  async saveUser(user:User) {
+    return this.userRepository.save(user);
   }
 
   async getAllItems(walletAddress: string): Promise<UpdateItemsDto> {
@@ -93,6 +104,14 @@ export class UsersService {
       .createQueryBuilder("User").orderBy("score", "DESC").getOne();
 
     return user;
+  }
+
+ 
+
+  async useScore(walletAddress: string, amount:number){
+    const user = await this.findUserOrCreate(walletAddress);
+    user.withdrawed_score = user.withdrawed_score + amount;
+    return this.saveUser(user)
   }
 
 }

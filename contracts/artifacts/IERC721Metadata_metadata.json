@@ -391,7 +391,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/ERC721Flatten.sol": "IERC721Metadata"
+			"ERC721Flatten.sol": "IERC721Metadata"
 		},
 		"evmVersion": "london",
 		"libraries": {},
@@ -405,7 +405,7 @@
 		"remappings": []
 	},
 	"sources": {
-		"contracts/ERC721Flatten.sol": {
+		"ERC721Flatten.sol": {
 			"keccak256": "0xea81d5b536b971e72005accf11317aca447773a57691b94625f4b92a5eaca82d",
 			"license": "MIT",
 			"urls": [
