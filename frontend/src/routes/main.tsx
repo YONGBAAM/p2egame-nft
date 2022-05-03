@@ -1,14 +1,15 @@
 import { Button } from '@chakra-ui/button';
 import { Box, Flex, Text } from '@chakra-ui/layout';
-import Caver, { Contract,} from 'caver-js';
+import Caver, { Contract, } from 'caver-js';
 import React, { FC, useEffect, useState } from 'react'
-import {fromWei} from "web3-utils"
+import { Link as ChakraLink } from "@chakra-ui/react"
+import { fromWei } from "web3-utils"
 import CharacterCard from '../components/CharacterCard';
-import { caver, mintAnimalTokenContract , nftAbi, nftAddress} from '../web3Config';
+import { caver, mintAnimalTokenContract, nftAbi, nftAddress } from '../web3Config';
 
 interface mainProps {
     account: string;
-    contract?:Contract;
+    contract?: Contract;
 }
 
 const Main: FC<mainProps> = (props) => {
@@ -17,7 +18,7 @@ const Main: FC<mainProps> = (props) => {
     const [lastMintNftId, setLastMintNftId] = useState<number>(0);
 
     const account = props.account;
-    const  contract = props.contract;
+    const contract = props.contract;
 
     const getMintValueInBN = async () => {
         try {
@@ -36,13 +37,13 @@ const Main: FC<mainProps> = (props) => {
     const updateCostInEther = async () => {
         try {
             const costInBn = await getMintValueInBN();
-            if (costInBn === undefined) {return}
+            if (costInBn === undefined) { return }
             costInBn && setCostInEther(fromWei(costInBn))
             console.log(fromWei(costInBn))
             // costInBn && setCostInEther(Caver.utils.fromWei(costInBn).toNumber())
-    
+
         } catch (error) {
-         console.error(error)   
+            console.error(error)
         }
 
     }
@@ -52,49 +53,58 @@ const Main: FC<mainProps> = (props) => {
     }, [contract]) // contract가 변할때마다 실행됨
 
     // TODO: What function type?
-    const onClickMint = async (setTxidMessage:any) => {
+    const onClickMint = async (setTxidMessage: any) => {
 
         try {
             if (!account) console.error("err")
             console.log(account);
             if (!contract) return;
-            
+
             const mintValue = await getMintValueInBN();
 
             // NOTE:::: THIS VALUE NEED TO BE SET! with payable!!
             const estimateGas = await contract.methods.mint(1)
-            .estimateGas({ from: account,
-                gas: 6000000,
-                value: mintValue
-            })
+                .estimateGas({
+                    from: account,
+                    gas: 6000000,
+                    value: mintValue
+                })
             console.log(estimateGas)
             await contract.methods.mint(1)
-            .send({from:account, gas:estimateGas, value:mintValue});
+                .send({ from: account, gas: estimateGas, value: mintValue });
 
             const wallets = await mintAnimalTokenContract.methods
-            .walletOfOwnerV2(account)
-            .call();
-            
-            setLastMintNftId(wallets[wallets.length-1]['id'])
+                .walletOfOwnerV2(account)
+                .call();
+
+            setLastMintNftId(wallets[wallets.length - 1]['id'])
 
         } catch (error) {
             console.error(error)
         }
     };
-    
+
 
     return ( // TODO: Add address for query txid
         <Flex w="full" h="100vh"
             justifyContent="center" alignItems="center" direction="column">
             <Text>{`Mint Cost: ${costInEther} Klay`}</Text>
             <Text>{`Please Install Kaikas and login`}</Text>
-            <Button mt = {6} mb = {6} size="lg" colorScheme="blue" 
-            onClick={() => onClickMint(setTxidMessage)}>
-                mint
+            <Flex direction="row">
+                <Button mt={6} mb={6} size="lg" colorScheme="blue"
+                    onClick={() => onClickMint(setTxidMessage)}>
+                    mint
                 </Button>
-            <Box alignItems = "center">
-                <Text> {txidMessage && "txid: " +  txidMessage}</Text>
-                {lastMintNftId !==0? <CharacterCard nftId = {lastMintNftId} type = {0} /> : <Text>Let's mint Card</Text>}
+
+                <ChakraLink href={"http://opensea.io/collection/jumping-under-the-sea"} isExternal>
+
+                    <Button mt={6} mb={6} ml = {6} size="lg" colorScheme="blue">
+                        Buy
+                    </Button>
+                </ChakraLink></Flex>
+            <Box alignItems="center">
+                <Text> {txidMessage && "txid: " + txidMessage}</Text>
+                {lastMintNftId !== 0 ? <CharacterCard nftId={lastMintNftId} type={0} /> : <Text>Let's mint Card</Text>}
             </Box>
         </Flex>
     )

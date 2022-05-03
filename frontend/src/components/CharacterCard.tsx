@@ -19,7 +19,7 @@ const CharacterCard: FC<ICardProps> = (props) => {
             <Image w={150} h={150} src={`${process.env.PUBLIC_URL}/images/${nftId}.png`} alt="animalImage" />
             <Box flexDirection="row"> 
             <Button size = 'sm' onClick = {() =>{
-                window.open("http://www.opensea.com")
+                window.open(`https://opensea.io/assets/klaytn/${process.env.REACT_APP_CONTRACT_DEPLOYED_ADDRESS}/${nftId}`)
             }}>{displayText}</Button>
 
             </Box>
