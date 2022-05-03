@@ -26,7 +26,7 @@ const GameStorage:FC<gameStorageProps> = ({
     const apiEndpoint = process.env.REACT_APP_API_HOST;
 
     const [cardArray, setCardArray] = useState<ICardProps[]>([
-        {nftId:500, type:33}
+        {nftId:500, type:33, lot:0}
     ]);
 
     const getItemList =  async () => {

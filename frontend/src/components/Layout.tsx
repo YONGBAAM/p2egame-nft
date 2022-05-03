@@ -53,7 +53,7 @@ const Layout: FC<LayoutProps> = ({ onConnected, setContract, account, children }
     };
 
     useEffect(() => {
-        window.klaytn.on('accountsChanged', function() {
+        window && window.klaytn && window.klaytn.on('accountsChanged', function() {
     	// kaikas에서 계정을 변경할 때 마다 내부의 함수가 실행됩니다.
     	console.log("Account changed");
         checkConnected(onConnected);
