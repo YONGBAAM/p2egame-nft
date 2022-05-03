@@ -2,7 +2,7 @@ import { Button } from '@chakra-ui/button'
 import { Box } from '@chakra-ui/layout'
 import axios from 'axios'
 import Caver, { Contract } from 'caver-js'
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
 import { nftAbi, nftAddress,  } from '../web3Config'
 import CharacterCard, { ICardProps } from './CharacterCard'
 
@@ -10,7 +10,8 @@ interface NftCardProps extends ICardProps {
     account:string,
     contract?:Contract,
     onClick?:Function,
-    setMessage?:Function
+    setMessage?:Function,
+    isButtonDisabled?:boolean
  };
 
 const NftCard: FC<NftCardProps> = (props) => {
@@ -20,6 +21,7 @@ const NftCard: FC<NftCardProps> = (props) => {
     const changgoAddress = process.env.REACT_APP_OWNER_ACCOUNT_ADDRESS;
     const onClick = props.onClick;
     const setMessage = props.setMessage;
+    const isButtonDisabled = props.isButtonDisabled? props.isButtonDisabled : false;
 
     const onClickDeposit = async () => {
         try {
@@ -81,6 +83,7 @@ const NftCard: FC<NftCardProps> = (props) => {
                         to Game
                     </Button>
                     <Button size="sm" colorScheme="blue" mt={2} display= "inline-block"
+                    disabled = {isButtonDisabled}
                     onClick = {() => {onClick&&onClick(); onClickGanghwa()}}>
                         +1
                     </Button>

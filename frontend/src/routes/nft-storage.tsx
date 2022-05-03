@@ -19,6 +19,7 @@ const NFTStorage:FC<NftStorageProps> = (props) => {
     const [myAllScore, setMyAllScore] = useState<number>(0);
     const [myUsedScore, setMyUsedScore] = useState<number>(0);
     const [displayMessage, setDisplayMessage] = useState<string>("");
+    const [buttonDisabled, setButtonDisabled] = useState<boolean>(false);
 
 
     const account = props.account;
@@ -71,6 +72,12 @@ const NFTStorage:FC<NftStorageProps> = (props) => {
     );
 
     useEffect(() => {
+      if (myAllScore< myUsedScore + 100) {
+        setButtonDisabled(true)
+      }      
+    }, [myAllScore, myUsedScore])
+
+    useEffect(() => {
       if (!account) return;
       getUsedScore();
   }, [account]
@@ -96,6 +103,7 @@ const NFTStorage:FC<NftStorageProps> = (props) => {
                         level = {v.level}
                         onClick = {onClick}
                         setMessage = {setDisplayMessage}
+                        isButtonDisabled = {buttonDisabled}
                     />
                 );
             })}
