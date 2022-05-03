@@ -97,7 +97,7 @@ const Layout: FC<LayoutProps> = ({ onConnected, setContract, account, children }
                         GAME-Storage
                     </Button>
                 </Link>
-                <ChakraLink href={"http://3.36.13.118:3000/"} isExternal>
+                <ChakraLink href={process.env.REACT_APP_GAME_HOST} isExternal>
 
                     <Button size="sm" colorScheme="blue">
                         GAME
