@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import { Stack, Flex, Box, Text, Button } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import {Link as ChakraLink} from "@chakra-ui/react"
 import Account from "./Account";
 import Caver from "caver-js";
 import { nftAbi, nftAddress } from "../web3Config";
@@ -89,12 +90,12 @@ const Layout: FC<LayoutProps> = ({ onConnected, setContract, account, children }
                         GAME-Storage
                     </Button>
                 </Link>
-                <Button size="sm" colorScheme="blue" onClick = {() => {
-                
-                        window.location.replace('http://localhost:8000')
-                }}>
-                        GAME3
+                <ChakraLink href={"http://3.36.13.118:3000/"} isExternal>
+
+                    <Button size="sm" colorScheme="blue">
+                        GAME
                     </Button>
+                </ChakraLink>
                 <Button onClick={() => connect(onConnected)}>
                     {account === "" ? ("login") : <Account account={account} />}
                 </Button>

@@ -43,7 +43,6 @@ import * as Joi from 'joi';
         database: process.env.NFT_DB_DATABASE,
         entities: [__dirname + '/**/*.entity.{js,ts}'],
         synchronize: (process.env.NFT_DB_SYNCHRONIZE === "true") ? true:false, // TODO: DO NOTT TRUE IN PROD, USE DOTENV or sth
-        logging: process.env.NODE_ENV !== 'production',
       }
     ),
     

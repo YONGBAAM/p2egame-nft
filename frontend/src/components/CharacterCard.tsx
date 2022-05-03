@@ -6,18 +6,21 @@ export interface ICardProps {
     nftId: number;
     type: number;
     lot?:number;
+    level?:number;
 }
 const CharacterCard: FC<ICardProps> = (props) => {
     const nftId = props.nftId;
     const type = props.type;
     const lot = props.lot? props.lot:1
+    const levelUDable = props.level;
+    const displayText = (levelUDable)?`#${nftId} Lv${levelUDable} X ${lot}`: `#${nftId} X ${lot}`
     return (
         <Box>
             <Image w={150} h={150} src={`${process.env.PUBLIC_URL}/images/${nftId}.png`} alt="animalImage" />
             <Box flexDirection="row"> 
             <Button size = 'sm' onClick = {() =>{
                 window.open("http://www.opensea.com")
-            }}>{`#${nftId} X ${lot}`}</Button>
+            }}>{displayText}</Button>
 
             </Box>
 

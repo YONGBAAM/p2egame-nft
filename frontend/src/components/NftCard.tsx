@@ -8,14 +8,18 @@ import CharacterCard, { ICardProps } from './CharacterCard'
 
 interface NftCardProps extends ICardProps {
     account:string,
-    contract?:Contract
+    contract?:Contract,
+    onClick?:Function,
+    setMessage?:Function
  };
 
 const NftCard: FC<NftCardProps> = (props) => {
     const account = props.account;
-    const id = props.nftId;
+    const nftId = props.nftId;
     const contract = props.contract;
     const changgoAddress = process.env.REACT_APP_OWNER_ACCOUNT_ADDRESS;
+    const onClick = props.onClick;
+    const setMessage = props.setMessage;
 
     const onClickDeposit = async () => {
         try {
@@ -35,10 +39,10 @@ const NftCard: FC<NftCardProps> = (props) => {
                 gas: 6000000
             })
 
-            console.log(account, changgoAddress, id)
+            console.log(account, changgoAddress, nftId)
             const result = await contract.methods
             .safeTransferFrom(
-                account, changgoAddress, id
+                account, changgoAddress, nftId
             )
             .send({from:account, gas:estimateGas});
 
@@ -47,7 +51,7 @@ const NftCard: FC<NftCardProps> = (props) => {
 
             if (result.transactionHash) {
                 const response = await 
-                    axios.put( "/api/inventory/" + account + "/items/" + id)
+                    axios.put( "/api/inventory/" + account + "/items/" + nftId)
                 console.log("add item: " + response)
 
             }
@@ -58,11 +62,27 @@ const NftCard: FC<NftCardProps> = (props) => {
         }
     }
 
+    const onClickGanghwa = async () => {
+        const result = await axios
+        .put(`api/game/ganghwa/${account}/${nftId}`);
+        if (result.data) {
+            setMessage && setMessage("Success")
+        }
+        else {
+            setMessage && setMessage("Fail")
+
+        }
+    }
+
     return (
         <Box textAlign = "center" w = {150} >
-        <CharacterCard nftId={props.nftId} type={props.type} />
+        <CharacterCard nftId={props.nftId} type={props.type} level = {props.level} />
         <Button size="sm" colorScheme="blue" mt={2} onClick={onClickDeposit} display= "inline-block">
                         to Game
+                    </Button>
+                    <Button size="sm" colorScheme="blue" mt={2} display= "inline-block"
+                    onClick = {() => {onClick&&onClick(); onClickGanghwa()}}>
+                        +1
                     </Button>
         </Box>
     )

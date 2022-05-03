@@ -34,13 +34,12 @@ export class GameController {
   @Get("my-topscore/:account")
   async getMyScore(@Param("account") account: string) {
     const score = await this.gameService.getScore(account);
-    return new ScoreDto(account, score);
+    return score;
   }
 
   @Get("my-usedscore/:account")
   async getMyUsedScore(@Param("account") account: string) {
-    const score = await this.gameService.getScore(account);
-    return new ScoreDto(account, score);
+    return this.gameService.getUsedScore(account);
   }
 
   @Put("my-usedscore/:account/:amount")
@@ -49,7 +48,10 @@ export class GameController {
     return new ScoreDto(account, score);
   }
 
-  
+  @Put("my-topscore/:account/:amount")
+  async putMyTopScore(@Param("account") account: string, @Param("amount") amount: number) {
+    const score = await this.gameService.putScore(account, amount);
+  }
 
   @Post("my-topscore")
   async postMyScore(@Body() dto: ScoreDto) {
