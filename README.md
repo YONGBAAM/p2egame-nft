@@ -1,5 +1,5 @@
 # p2egame-nft
-# This project is deprecated and will be followed up on p2egame-nft-backend[frontend, contracts]
+# This project will not be maintained and will be followed up on p2egame-nft-backend[frontend, contracts]
 P2E Game + NFT First Project
 
 This is deployed in http://sea-mint.game-matzip.link/
